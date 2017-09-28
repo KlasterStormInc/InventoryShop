@@ -1,0 +1,7 @@
+name: Shop
+main: cluster.shop.Shop
+version: 1.0
+commands:
+  shop:
+    usage: /shop <args>
+    permission: shop.command.usage

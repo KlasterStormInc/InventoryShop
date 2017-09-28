@@ -1,0 +1,22 @@
+
+amountRegex: '1,2,4,8,16'
+
+iconsLore:
+- '&cLeft Click &6- buy, &cRight Click&6 - sell'
+- '&eBuy price: &a{buy_price}'
+- '&eSell price: &c{sell_price}'
+
+extraIcons:
+  money:
+    enable: true
+    slot: 30
+    id: gold_ingot
+    name: '&aBalance'
+    lore:
+    - '&c{money}'
+  amount:
+    enable: true
+    slot: 31
+    id: iron_ingot
+    name: '&eChange amount'
+    lore: []
