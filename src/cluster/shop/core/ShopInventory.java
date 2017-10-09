@@ -15,6 +15,7 @@ import org.bukkit.material.MaterialData;
 
 import cluster.shop.Shop;
 import cluster.shop.bridge.EconomyBridge;
+import cluster.shop.items.ShopItem;
 import cluster.shop.util.Config;
 import cluster.shop.util.Deserializer;
 import cluster.shop.util.RequiredItem;
@@ -36,12 +37,34 @@ public class ShopInventory {
 		
 		for (String item : items) {
 			String[] arr = item.split(" ");
-			MaterialData material = Deserializer.deserialize(arr[0]);
+			
+			ItemStack stack, orig;
 			double buy = Double.parseDouble(arr[1]) * multiplier;
 			double sell = Double.parseDouble(arr[2]) * multiplier;
-			ItemStack stack = craftStack(material, multiplier, buy, sell);
+			
+			boolean f = arr[0].startsWith("$");
+			
+			if(f)
+			{
+				String key = arr[0].substring(1);
+				ShopItem i = Shop.getItemManager().getItem(key);
+				if(i == null) {
+					Shop.err("Item '" + key + "' is not defined in items.yml");
+					n++;
+					continue;
+				}
+				orig = i.getItem();
+				stack = craftStack(i.getItem(), multiplier, buy, sell);
+			} else {
+				MaterialData material = Deserializer.deserialize(arr[0]);
+				stack = craftStack(material, multiplier, buy, sell);
+				orig = stack;
+			}
+			
 			inventory.setItem(n, stack);
-			this.items.put(n, new Item(stack, buy, sell));
+			Item citem = new Item(orig, buy, sell);
+			if(f) citem.g(true);
+			this.items.put(n, citem);
 			n++;
 		}
 		
@@ -100,8 +123,10 @@ public class ShopInventory {
 		Item item = items.get(slot);
 		if(item == null) return;
 		if(right) {
+			if(item.getSellPrice() <= 0) return;
 			ItemStack it = item.getItemStack();
-			RequiredItem r = new RequiredItem(it.getType(), multiplier);
+			RequiredItem r = item.e() ? new RequiredItem(it, multiplier) : 
+				new RequiredItem(it.getType(), multiplier);
 			r.setRestrictiveDataValue(it.getDurability());
 			
 			if(r.hasItem(p)) {
@@ -120,10 +145,14 @@ public class ShopInventory {
 				Sounds.play(p, Sounds.noItem);
 			}
 		} else {
+			if(item.getBuyPrice() <= 0) return;
 			if(EconomyBridge.hasMoney(p, item.getBuyPrice())) {
 				EconomyBridge.takeMoney(p, item.getBuyPrice());
-				p.getInventory().addItem(new ItemStack
-						(item.getItemStack().getType(), multiplier, item.getItemStack().getDurability()));
+				ItemStack newItem = item.getItemStack().clone();
+				newItem.setAmount(multiplier);
+				p.getInventory().addItem(newItem);
+				//p.getInventory().addItem(new ItemStack
+				//		(item.getItemStack().getType(), multiplier, item.getItemStack().getDurability()));
 				String msg = Config.bought;
 				msg = msg.replace("{amount}", String.valueOf(multiplier)).
 						replace("{item}", item.getSimpleItem().getType().toString());
@@ -164,6 +193,27 @@ public class ShopInventory {
 				e.replace("{buy_price}", String.valueOf(b))
 				.replace("{sell_price}", String.valueOf(s))
 				.replace("&", "\u00a7"));
+		}
+		meta.setLore(lm);
+		item.setItemMeta(meta);
+		return item;
+	}
+	private ItemStack craftStack(ItemStack item, int multiplier, double b, double s) {
+		item.setAmount(multiplier);
+		ItemMeta meta = item.getItemMeta();
+		
+		List<String> lm;
+		if(meta.hasLore()) {
+			lm = meta.getLore();
+			lm.add("§a");
+		} else lm = new ArrayList<>();
+		
+		List<String> lore = Shop.getInstance().getConfig().getStringList("iconsLore");
+		for (String e : lore) {
+			lm.add(
+					e.replace("{buy_price}", String.valueOf(b))
+					.replace("{sell_price}", String.valueOf(s))
+					.replace("&", "\u00a7"));
 		}
 		meta.setLore(lm);
 		item.setItemMeta(meta);

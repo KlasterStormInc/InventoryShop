@@ -38,14 +38,14 @@ public class ShopCommand implements CommandExecutor {
 			}
 			
 			Player p;
-			if(args.length > 2) {
+			if(args.length > 2 && sender.hasPermission("shop.command.open.others")) {
 				p = Bukkit.getPlayer(args[2]);
 			} else if(sender instanceof Player) {
 				p = (Player) sender;
 			} else return true;
 			
 			if(p == null) {
-				sender.sendMessage("§cPlayer '" + args[2] + " not found");
+				sender.sendMessage("§cPlayer '" + args[2] + "' not found");
 				return true;
 			}
 			
@@ -82,6 +82,7 @@ public class ShopCommand implements CommandExecutor {
 			Shop.getShopManager().close();
 			Config.load();
 			Sounds.load();
+			Shop.getInstance().defineItems();
 			Shop.getInstance().defineManager();
 			sender.sendMessage("§aConfiguration and shops reloaded!");
 			return true;

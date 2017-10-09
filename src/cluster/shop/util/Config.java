@@ -27,13 +27,13 @@ public class Config {
 		
 		
 		try {
-			changeAmountItem = Deserializer.craft(c.getString("changeAmountIcon.id"),
-					c.getString("changeAmountIcon.name"), c.getStringList("changeAmountIcon.lore"));
+			changeAmountItem = Deserializer.craft(c.getString("extraIcon.id"),
+					c.getString("extraIcon.name"), c.getStringList("extraIcon.lore"));
 		} catch (Exception e) {
 			changeAmountItem = null;
 		}
-		enabledChangeAmountItem = changeAmountItem == null ? false : c.getBoolean("changeAmountIcon.enable");
-		changeAmountItemSlot = c.getInt("changeAmountIcon.slot", -1);
+		enabledChangeAmountItem = changeAmountItem == null ? false : c.getBoolean("extraIcon.enable");
+		changeAmountItemSlot = c.getInt("extraIcon.slot", -1);
 		
 		ignoreColoredDisplay = c.getBoolean("ignoreColoredDisplay", true);
 	}

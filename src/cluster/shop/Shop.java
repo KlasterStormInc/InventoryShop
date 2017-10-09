@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import cluster.shop.bridge.EconomyBridge;
 import cluster.shop.core.ShopManager;
+import cluster.shop.items.ItemManager;
 import cluster.shop.listener.InventoryListener;
 import cluster.shop.util.Config;
 import cluster.shop.util.Sounds;
@@ -15,6 +16,7 @@ public class Shop extends JavaPlugin {
 
 	private static Shop instance;
 	private ShopManager manager;
+	private ItemManager items;
 	
 	@Override
 	public void onEnable() {
@@ -22,9 +24,11 @@ public class Shop extends JavaPlugin {
 		
 		saveDefaultConfig();
 		saveResource("shops.yml", false);
+		saveResource("items.yml", false);
 		
 		Config.load();
 		Sounds.load();
+		defineItems();
 		defineManager();
 		EconomyBridge.setupEconomy();
 		Bukkit.getPluginManager().registerEvents(new InventoryListener(), this);
@@ -42,6 +46,9 @@ public class Shop extends JavaPlugin {
 	public static ShopManager getShopManager() {
 		return instance.manager;
 	}
+	public static ItemManager getItemManager() {
+		return instance.items;
+	}
 	
 	public static void err(String msg, Throwable e) {
 		instance.getLogger().log(Level.SEVERE, msg, e);
@@ -49,7 +56,7 @@ public class Shop extends JavaPlugin {
 
 
 	public static void err(Throwable e) {
-		instance.getLogger().log(Level.SEVERE, "An internal error occurred", e);
+		instance.getLogger().log(Level.SEVERE, "An error occurred", e);
 	}
 	
 	public static void err(String s) {
@@ -57,6 +64,10 @@ public class Shop extends JavaPlugin {
 	}
 
 
+	public void defineItems() {
+		items = new ItemManager(this);
+	}
+	
 	public void defineManager() {
 		manager = new ShopManager(this);
 	}

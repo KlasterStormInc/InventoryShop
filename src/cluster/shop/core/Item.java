@@ -7,6 +7,7 @@ public class Item {
 	private ItemStack itemStack;
 	private double buyPrice;
 	private double sellPrice;
+	private boolean f;
 
 	public Item(ItemStack itemStack, double buyPrice, double sellPrice) {
 		this.itemStack = itemStack;
@@ -40,5 +41,13 @@ public class Item {
 
 	public ItemStack getSimpleItem() {
 		return new ItemStack(itemStack.getType(), itemStack.getAmount());
+	}
+
+	public boolean e() {
+		return f;
+	}
+	
+	public void g(boolean a) {
+		f = a;
 	}
 }
